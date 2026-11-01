@@ -34,48 +34,59 @@ export default function Dropzone({ onFiles }: Props) {
   )
 
   return (
-    <div
-      className={'dropzone' + (dragging ? ' dragging' : '')}
-      onClick={() => inputRef.current?.click()}
-      onDragOver={(e) => {
-        e.preventDefault()
-        setDragging(true)
-      }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={(e) => {
-        e.preventDefault()
-        setDragging(false)
-        handle(e.dataTransfer.files)
-      }}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
-    >
-      <div className="dropzone-icon">📄</div>
-      <div className="dropzone-title">拖拽文件到此处，或点击选择</div>
-      <div className="dropzone-sub">支持多选 · 文件仅在浏览器本地处理，不会上传</div>
-      <input
-        ref={inputRef}
-        type="file"
-        multiple
-        accept={ACCEPT}
-        onChange={(e) => {
-          handle(e.target.files)
-          e.target.value = ''
+    <>
+      <div
+        className={'dropzone' + (dragging ? ' dragging' : '')}
+        onClick={() => inputRef.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDragging(true)
         }}
-      />
-      <div className="format-chips">
-        {Object.values(FORMATS)
-          .filter((f) => f.targets.length > 0)
-          .map((f) => (
-            <span className="chip" key={f.id}>
-              <span className="dot" style={{ background: DOT_COLORS[f.id] }} />
-              {f.label}
-              <span style={{ color: 'var(--text-3)' }}>.{f.ext[0]}</span>
-            </span>
-          ))}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setDragging(false)
+          handle(e.dataTransfer.files)
+        }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
+      >
+        <div className="dropzone-icon">📄</div>
+        <div className="dropzone-title">拖拽文件到此处，或点击选择</div>
+        <div className="dropzone-sub">支持多选 · 文件仅在浏览器本地处理，不会上传</div>
+        <input
+          ref={inputRef}
+          type="file"
+          multiple
+          accept={ACCEPT}
+          onChange={(e) => {
+            handle(e.target.files)
+            e.target.value = ''
+          }}
+        />
+        <div className="format-chips">
+          {Object.values(FORMATS)
+            .filter((f) => f.targets.length > 0)
+            .map((f) => (
+              <span className="chip" key={f.id}>
+                <span className="dot" style={{ background: DOT_COLORS[f.id] }} />
+                {f.label}
+                <span style={{ color: 'var(--text-3)' }}>.{f.ext[0]}</span>
+              </span>
+            ))}
+        </div>
       </div>
-    </div>
+
+      <details className="mobile-import-tip" open>
+        <summary>📱 手机微信 / QQ 收到的文件怎么导入？</summary>
+        <div className="tip-body">
+          <p>当前网页在手机上无法直接读取微信 / QQ 内部文件（系统沙盒限制），按下面方法即可正常导入：</p>
+          <p><b>iOS：</b>在微信 / QQ 打开文件 → 点右上角「···」→「存储到文件」或「用其他应用打开」→ 存到「我的 iPhone」；再点上方「选取文件」，在「文件」App 中选它。</p>
+          <p><b>安卓：</b>直接点「选取文件」→ 文件管理器里找 <code>Tencent/MicroMsg/Download</code>（微信）或 <code>Tencent/QQfile_recv</code>（QQ）。</p>
+        </div>
+      </details>
+    </>
   )
 }
 
