@@ -116,7 +116,22 @@ async function main() {
     out.push(`${ok ? 'PASS' : 'FAIL'}  csv->json-content-check`)
     ok ? pass++ : fail++
   }
-  await run('csv', 'xlsx', file('data.csv', CSV, 'text/csv'))
+  const csvXlsx = await run('csv', 'xlsx', file('data.csv', CSV, 'text/csv'))
+  if (csvXlsx) {
+    const xf = new File([csvXlsx.blob], 'data.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const rDocx = await run('xlsx', 'docx', xf)
+    if (rDocx) {
+      const w = new File([rDocx.blob], 'data.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+      const rh = await run('docx', 'html', w)
+      if (rh) {
+        const t = await rh.blob.text()
+        const ok = t.includes('张三') && t.includes('<table>')
+        out.push(`${ok ? 'PASS' : 'FAIL'}  xlsx->docx->html-roundtrip-check (表格与数据保留)`)
+        ok ? pass++ : fail++
+      }
+    }
+    await run('xlsx', 'pdf', xf)
+  }
   await run('csv', 'html', file('data.csv', CSV, 'text/csv'))
   await run('csv', 'markdown', file('data.csv', CSV, 'text/csv'))
   const jsonCsv = await run('json', 'csv', file('data.json', JSON_DATA, 'application/json'))

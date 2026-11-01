@@ -1,4 +1,6 @@
 import * as XLSX from 'xlsx'
+import { htmlToDocx } from '../lib/htmlToDocx'
+import { htmlToPdf } from '../lib/htmlToPdf'
 import { readAsArrayBuffer, baseName } from '../lib/download'
 import type { ConvertContext } from '../types'
 
@@ -37,14 +39,22 @@ export async function excelConverter(ctx: ConvertContext, to: string) {
     const out = JSON.stringify(obj, null, 2)
     return { blob: new Blob([out], { type: 'application/json;charset=utf-8' }), filename: name + '.json', previewText: out, previewType: 'text' as const }
   }
-  if (to === 'html') {
+  if (to === 'html' || to === 'docx' || to === 'pdf') {
     const tables = wb.SheetNames.map((sn) => arrayToHtmlTable(XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '' }) as unknown[][], sn)).join('')
-    return {
-      blob: new Blob([`<!doctype html><html><head><meta charset="utf-8">${TABLE_CSS}</head><body>${tables}</body></html>`], { type: 'text/html;charset=utf-8' }),
-      filename: name + '.html',
-      previewHtml: tables,
-      previewType: 'html' as const,
+    if (to === 'html') {
+      return {
+        blob: new Blob([`<!doctype html><html><head><meta charset="utf-8">${TABLE_CSS}</head><body>${tables}</body></html>`], { type: 'text/html;charset=utf-8' }),
+        filename: name + '.html',
+        previewHtml: tables,
+        previewType: 'html' as const,
+      }
     }
+    if (to === 'docx') {
+      const blob = await htmlToDocx(tables, name)
+      return { blob, filename: name + '.docx', previewHtml: tables, previewType: 'html' as const }
+    }
+    const blob = await htmlToPdf(tables)
+    return { blob, filename: name + '.pdf', previewType: 'none' as const }
   }
   throw new Error('不支持的目标格式: ' + to)
 }

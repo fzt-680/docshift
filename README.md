@@ -19,7 +19,7 @@
 | Word (.docx) | HTML、Markdown、TXT、PDF |
 | HTML (.html) | Markdown、TXT、PDF |
 | PDF (.pdf) | Markdown、Word (.docx)、Excel (.xlsx)、PPT (.pptx)、TXT、HTML（启发式内容重建） |
-| Excel (.xlsx/.xls) | CSV、JSON、HTML |
+| Excel (.xlsx/.xls) | CSV、JSON、HTML、Word (.docx)、PDF |
 | CSV/TSV | JSON、Excel、HTML、Markdown |
 | JSON | CSV、Excel |
 | TXT | Markdown、HTML、PDF、Word |

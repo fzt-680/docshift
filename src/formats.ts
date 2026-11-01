@@ -39,7 +39,7 @@ export const FORMATS: Record<FormatId, FormatDef> = {
     ext: ['xlsx', 'xls'],
     mime: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'],
     icon: 'X',
-    targets: ['csv', 'json', 'html'],
+    targets: ['csv', 'json', 'html', 'docx', 'pdf'],
   },
   csv: {
     id: 'csv',
