@@ -143,28 +143,74 @@ async function main() {
   await run('image', 'pdf', pngFile)
   await run('image', 'image', pngFile, { format: 'webp', quality: 80 })
 
-  // 5. PDF 回读：jsPDF 生成带真实文字层的 PDF，验证提取链路
+  // 5. PDF 结构化输出（启发式四链路）
   {
     const { default: JsPdf } = await import('jspdf')
     const p = new JsPdf({ unit: 'pt', format: 'a4' })
-    p.text('DocShift Test Document', 72, 100)
-    p.text('Second line content', 72, 130)
-    p.addPage()
-    p.text('Page two content', 72, 100)
+    p.setFontSize(22)
+    p.text('DocShift Test Document', 72, 90)
+    p.setFontSize(14)
+    p.text('Section One', 72, 130)
+    p.setFontSize(11)
+    p.text('This is the first body paragraph of the test document.', 72, 160)
+    p.text('Second body line continues here.', 72, 180)
+    p.text('Section Two', 72, 220)
+    p.text('Column A value', 72, 260)
+    p.text('Column B value', 250, 260)
+    p.text('Row two left', 72, 280)
+    p.text('Row two right', 250, 280)
+    p.text('- bullet item one', 72, 320)
+    p.text('- bullet item two', 72, 340)
     const textPdf = p.output('blob')
-    const back = new File([textPdf], 'text.pdf', { type: 'application/pdf' })
-    const r = await run('pdf', 'txt', back)
-    if (r) {
-      const t = await r.blob.text()
-      const ok = t.includes('DocShift Test Document') && t.includes('Page two content')
-      out.push(`${ok ? 'PASS' : 'FAIL'}  pdf->txt-content-check => ${JSON.stringify(t.slice(0, 80))}`)
+    const back = new File([textPdf], 'struct.pdf', { type: 'application/pdf' })
+
+    const rTxt = await run('pdf', 'txt', back)
+    if (rTxt) {
+      const t = await rTxt.blob.text()
+      const ok = t.includes('DocShift Test Document')
+      out.push(`${ok ? 'PASS' : 'FAIL'}  pdf->txt-content-check`)
       ok ? pass++ : fail++
     }
-    const r2 = await run('pdf', 'html', back)
-    if (r2) {
-      const t = await r2.blob.text()
-      const ok = t.includes('DocShift Test Document') && t.includes('第 2 页')
-      out.push(`${ok ? 'PASS' : 'FAIL'}  pdf->html-content-check`)
+
+    const rMd = await run('pdf', 'markdown', back)
+    if (rMd) {
+      const t = await rMd.blob.text()
+      const ok = t.includes('# DocShift Test Document') && t.includes('## Section One') && t.includes('- bullet item one')
+      out.push(`${ok ? 'PASS' : 'FAIL'}  pdf->markdown-heuristic-check (标题/列表识别)`)
+      ok ? pass++ : fail++
+    }
+
+    const rDocx = await run('pdf', 'docx', back)
+    if (rDocx) {
+      const w = new File([rDocx.blob], 'struct.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+      const rh = await run('docx', 'html', w)
+      if (rh) {
+        const t = await rh.blob.text()
+        const ok = t.includes('DocShift Test Document') && t.includes('<h1>')
+        out.push(`${ok ? 'PASS' : 'FAIL'}  pdf->docx->html-roundtrip-check`)
+        ok ? pass++ : fail++
+      }
+    }
+
+    const rXlsx = await run('pdf', 'xlsx', back)
+    if (rXlsx) {
+      const XLSXLib = await import('xlsx')
+      const wb = XLSXLib.read(await rXlsx.blob.arrayBuffer(), { type: 'array' })
+      const csv = XLSXLib.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]])
+      const ok = csv.includes('Column A value') && csv.includes('Column B value') && csv.includes('Row two right')
+      out.push(`${ok ? 'PASS' : 'FAIL'}  pdf->xlsx-column-cluster-check (坐标聚类分列)`)
+      ok ? pass++ : fail++
+    }
+
+    const rPptx = await run('pdf', 'pptx', back)
+    if (rPptx) {
+      const JSZipLib = await import('jszip')
+      const zip = await JSZipLib.loadAsync(rPptx.blob)
+      const names = Object.keys(zip.files)
+      const slideFiles = names.filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+      const s1 = slideFiles.length ? await zip.files[slideFiles[0]].async('string') : ''
+      const ok = slideFiles.length >= 2 && s1.includes('DocShift Test Document')
+      out.push(`${ok ? 'PASS' : 'FAIL'}  pdf->pptx-slide-check (${slideFiles.length} 页，首页含标题)`)
       ok ? pass++ : fail++
     }
   }

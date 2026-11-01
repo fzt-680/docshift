@@ -10,6 +10,7 @@ export type FormatId =
   | 'json'
   | 'txt'
   | 'image'
+  | 'pptx'
 
 export interface FormatDef {
   id: FormatId

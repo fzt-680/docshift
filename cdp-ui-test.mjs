@@ -66,7 +66,8 @@ async function main() {
   const qResp = await send('DOM.querySelector', { nodeId: docNodeId, selector: 'input[type=file]' })
   const nodeId = qResp.result.nodeId
   if (!nodeId) throw new Error('未找到文件输入框')
-  await send('DOM.setFileInputFiles', { nodeId, files: [TEST_FILE] })
+  const setResp = await send('DOM.setFileInputFiles', { nodeId, files: [TEST_FILE] })
+  if (setResp.error) throw new Error('文件注入失败（文件不存在?）: ' + JSON.stringify(setResp.error))
   await sleep(600)
 
   const cardCount = await evalJs("document.querySelectorAll('.file-card').length")

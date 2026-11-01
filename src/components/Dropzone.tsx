@@ -7,6 +7,7 @@ interface Props {
 }
 
 const ACCEPT = Object.values(FORMATS)
+  .filter((f) => f.targets.length > 0)
   .flatMap((f) => f.ext.map((e) => '.' + e))
   .join(',')
 
@@ -64,13 +65,15 @@ export default function Dropzone({ onFiles }: Props) {
         }}
       />
       <div className="format-chips">
-        {Object.values(FORMATS).map((f) => (
-          <span className="chip" key={f.id}>
-            <span className="dot" style={{ background: DOT_COLORS[f.id] }} />
-            {f.label}
-            <span style={{ color: 'var(--text-3)' }}>.{f.ext[0]}</span>
-          </span>
-        ))}
+        {Object.values(FORMATS)
+          .filter((f) => f.targets.length > 0)
+          .map((f) => (
+            <span className="chip" key={f.id}>
+              <span className="dot" style={{ background: DOT_COLORS[f.id] }} />
+              {f.label}
+              <span style={{ color: 'var(--text-3)' }}>.{f.ext[0]}</span>
+            </span>
+          ))}
       </div>
     </div>
   )
@@ -86,4 +89,5 @@ export const DOT_COLORS: Record<FormatId, string> = {
   json: '#b7791f',
   txt: '#6b7280',
   image: '#805ad5',
+  pptx: '#c2410c',
 }

@@ -31,7 +31,7 @@ export const FORMATS: Record<FormatId, FormatDef> = {
     ext: ['pdf'],
     mime: ['application/pdf'],
     icon: 'P',
-    targets: ['txt', 'html'],
+    targets: ['markdown', 'docx', 'xlsx', 'pptx', 'txt', 'html'],
   },
   xlsx: {
     id: 'xlsx',
@@ -72,6 +72,15 @@ export const FORMATS: Record<FormatId, FormatDef> = {
     mime: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp'],
     icon: 'I',
     targets: ['pdf', 'image'],
+  },
+  pptx: {
+    id: 'pptx',
+    label: 'PPT 演示',
+    ext: ['pptx'],
+    mime: ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
+    icon: 'S',
+    // PPT 目前仅作为 PDF 的转换目标，不作为源格式
+    targets: [],
   },
 }
 

@@ -18,7 +18,7 @@
 | Markdown (.md) | HTML、PDF、Word (.docx)、TXT |
 | Word (.docx) | HTML、Markdown、TXT、PDF |
 | HTML (.html) | Markdown、TXT、PDF |
-| PDF (.pdf) | TXT、HTML（文本级提取） |
+| PDF (.pdf) | Markdown、Word (.docx)、Excel (.xlsx)、PPT (.pptx)、TXT、HTML（启发式内容重建） |
 | Excel (.xlsx/.xls) | CSV、JSON、HTML |
 | CSV/TSV | JSON、Excel、HTML、Markdown |
 | JSON | CSV、Excel |
@@ -99,8 +99,8 @@ npx vite build --config vite.config.test.ts   # 构建测试包 → dist-test
 
 ## ⚠️ 已知限制
 
+- PDF → Word/Excel/PPT/Markdown 为**启发式内容重建**（按字号推断标题、按符号识别列表、按坐标聚类分列），非高保真还原；表格、合并单元格、复杂排版无法从 PDF 坐标可靠还原，每个输出文件内均附说明
 - 扫描件 PDF（纯图片）无文字层，无法提取文本（真实 PDF 文件的文字层提取不受影响）
-- PDF → Word/Excel 等高保真还原不在浏览器端能力范围内，仅提供文本级提取
 - 超大文件受浏览器内存约束，建议数百 MB 以内
 
 ## 📄 License

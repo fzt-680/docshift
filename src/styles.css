@@ -183,6 +183,7 @@ input, select { font-family: var(--font); }
 .file-icon.json { background: linear-gradient(135deg, #b7791f, #d69e2e); }
 .file-icon.txt { background: linear-gradient(135deg, #6b7280, #9ca3af); }
 .file-icon.image { background: linear-gradient(135deg, #805ad5, #a37bf0); }
+.file-icon.pptx { background: linear-gradient(135deg, #c2410c, #ea7c3c); }
 
 .file-meta { min-width: 0; flex: 1; }
 .file-name { font-weight: 650; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

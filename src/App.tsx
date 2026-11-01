@@ -47,10 +47,15 @@ export default function App() {
   const addFiles = useCallback((files: { file: File; from: FormatId }[]) => {
     setItems((prev) => {
       const next = [...prev]
+      let skippedPpt = 0
       files.forEach(({ file, from }) => {
         // 去重：同名同大小视为同一文件
         if (next.some((i) => i.file.name === file.name && i.file.size === file.size)) return
         const targets = targetsOf(from)
+        if (!targets.length) {
+          skippedPpt++
+          return
+        }
         next.push({
           id: nextId(),
           file,
@@ -61,6 +66,9 @@ export default function App() {
           progress: 0,
         })
       })
+      if (skippedPpt) {
+        window.dispatchEvent(new CustomEvent('docshift-toast', { detail: { msg: `PPT 暂不支持作为源格式（仅可作为 PDF 的转换目标）`, type: 'error' } }))
+      }
       return next
     })
   }, [])
