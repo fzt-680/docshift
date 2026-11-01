@@ -1,5 +1,6 @@
-import { FORMATS, targetsOf, defaultExt } from '../formats'
+import { FORMATS, targetsOf } from '../formats'
 import { formatSize } from '../lib/download'
+import FormatSelect from './FormatSelect'
 import type { FormatId, QueueItem } from '../types'
 
 interface Props {
@@ -48,19 +49,13 @@ export default function FileCard({ item, onTargetChange, onOptionChange, onConve
         <div className="flow">
           <span className="tag">{from.label}</span>
           <span className="arrow">→</span>
-          <select
-            className="target-select"
+          <FormatSelect
             value={item.to}
             disabled={busy || done}
-            onChange={(e) => onTargetChange(e.target.value as FormatId)}
-            aria-label="目标格式"
-          >
-            {targetsOf(item.from).map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.label}
-              </option>
-            ))}
-          </select>
+            ariaLabel="目标格式"
+            options={targetsOf(item.from).map((t) => ({ value: t.id, label: t.label }))}
+            onChange={(v) => onTargetChange(v as FormatId)}
+          />
         </div>
 
         <div className="file-actions">
@@ -91,15 +86,16 @@ export default function FileCard({ item, onTargetChange, onOptionChange, onConve
         <div className="img-opts">
           <label>
             目标格式
-            <select
-              className="target-select"
+            <FormatSelect
               value={(item.options?.format as string) ?? 'jpg'}
-              onChange={(e) => onOptionChange('format', e.target.value)}
-            >
-              <option value="png">PNG（无损）</option>
-              <option value="jpg">JPG（体积小）</option>
-              <option value="webp">WebP（均衡）</option>
-            </select>
+              ariaLabel="图片目标格式"
+              options={[
+                { value: 'png', label: 'PNG（无损）' },
+                { value: 'jpg', label: 'JPG（体积小）' },
+                { value: 'webp', label: 'WebP（均衡）' },
+              ]}
+              onChange={(v) => onOptionChange('format', v)}
+            />
           </label>
           <label>
             质量
@@ -121,11 +117,6 @@ export default function FileCard({ item, onTargetChange, onOptionChange, onConve
             已按 {String(item.options?.format ?? 'jpg').toUpperCase()} · 质量 {Number(item.options?.quality ?? 85)}% 输出
           </span>
         </div>
-      )}
-
-      {/* 默认扩展名提示（非图片场景） */}
-      {!isImgToImg && item.from !== 'image' && (
-        <span style={{ display: 'none' }}>{defaultExt(item.to)}</span>
       )}
     </div>
   )

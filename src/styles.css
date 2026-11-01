@@ -197,11 +197,50 @@ input, select { font-family: var(--font); }
   white-space: nowrap;
 }
 .flow .arrow { color: var(--text-3); font-size: 13px; }
-select.target-select {
-  background: var(--bg-card); color: var(--text); border: 1px solid var(--border-strong);
-  border-radius: 8px; padding: 5px 8px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+
+/* ============ 自定义下拉（替代原生 select） ============ */
+.fselect { position: relative; display: inline-block; }
+.fselect-toggle {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--bg-card); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: 8px;
+  padding: 5px 10px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  min-width: 96px; transition: border-color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
 }
-select.target-select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+.fselect-toggle:hover:not(:disabled) { border-color: var(--primary); }
+.fselect-toggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.fselect-toggle:disabled { opacity: 0.55; cursor: not-allowed; }
+.fselect-toggle.open { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent); }
+.fselect-value { flex: 1; text-align: left; }
+.fselect-caret { color: var(--text-3); font-size: 11px; transition: transform 0.18s; }
+.fselect-caret.up { transform: rotate(180deg); }
+
+.fselect-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 80;
+  min-width: 100%; margin: 0; padding: 5px;
+  list-style: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  animation: fselectIn 0.14s ease;
+  min-width: 128px;
+}
+.fselect-menu.up { top: auto; bottom: calc(100% + 6px); }
+@keyframes fselectIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+.fselect-option {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 10px; border-radius: 7px;
+  font-size: 13px; color: var(--text-2); cursor: pointer;
+  white-space: nowrap; transition: background 0.12s;
+}
+.fselect-option:hover, .fselect-option.active { background: var(--bg-hover); color: var(--text); }
+.fselect-option.selected { color: var(--primary); font-weight: 650; }
+.fselect-check { width: 12px; font-size: 11px; flex-shrink: 0; }
 
 .file-actions { display: flex; gap: 6px; align-items: center; margin-left: auto; }
 
