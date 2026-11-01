@@ -9,3 +9,4 @@ dist-test/
 npm-debug.log*
 .wrangler/
 tsconfig.tsbuildinfo
+.deploy-secrets/
